@@ -1,0 +1,4 @@
+#the filename was AwsCredentials.properties
+#should have the form
+#secretkey=
+#accesskey=
