@@ -45,13 +45,22 @@ public class Contact {
 			}
 			input = "";
 			
+			//just a small thing so that the options aren't displaying every single time
+			boolean options = true;
+			
 			while(!input.contains("quit")) {
-				System.out.println("1) List bucket contents");
-				System.out.println("2) Delete object in bucket");
-				System.out.println("3) Create new object in bucket");
-				System.out.println("4) Edit object in bucket");
-				System.out.println("Type \"quit\" to exit");
-				System.out.println("Or enter a number for an option above");
+				if(options) {
+					System.out.println("1) List bucket contents");
+					System.out.println("2) Delete object in bucket");
+					System.out.println("3) Create new object in bucket");
+					System.out.println("4) Edit object in bucket");
+					System.out.println("Type \"quit\" to exit");
+					System.out.println("Or enter a number for an option above.");
+					options = false;
+				}
+				else {
+					System.out.println("Enter an option number or type \"options\" to display the options again.");
+				}
 				
 				input = sc.nextLine();
 				
@@ -62,6 +71,7 @@ public class Contact {
 					}
 				}
 				else if(input.charAt(0) == '2') {
+					//get the object name and delete it
 					System.out.println("Enter object name to delete:");
 					String oname = sc.nextLine();
 					if(ObExists(s3, bname, oname)) {
@@ -72,6 +82,7 @@ public class Contact {
 					}
 				}
 				else if(input.charAt(0) == '3') {
+					//ask for three values from user
 					System.out.println("Creating new contact");
 					System.out.println("Enter contact first name: ");
 					fname = sc.nextLine();
@@ -125,6 +136,7 @@ public class Contact {
 						contacts[ind] = sc.nextLine();
 					}
 					
+					System.out.println("Updating object.");
 					//delete old object and upload a new one
 					s3.deleteObject(bname, filename);
 					filename = writeHTML(contacts[0], contacts[1], contacts[2]);
@@ -133,6 +145,7 @@ public class Contact {
 					F.delete();
 				}
 				else if(input.contains("quit")) continue;
+				else if(input.contains("options")) options = true;
 				else {
 					System.out.println("Incorrect input.");
 				}
