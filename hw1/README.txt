@@ -1,0 +1,1 @@
+This should just run in java with no args. The AWS credentials are accessed through a file called "AwsCredentials.properties". I included a template file with basic information needed.
