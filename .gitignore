@@ -1,2 +1,5 @@
 *.properties
 bin/*
+.classpath
+.project
+
