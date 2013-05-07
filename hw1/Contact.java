@@ -1,6 +1,7 @@
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
+//import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.ClasspathPropertiesFileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -15,6 +16,7 @@ import java.io.*;
 public class Contact {
 	public static void main(String[] args) throws Exception {
 		AmazonS3 s3 = new AmazonS3Client(new ClasspathPropertiesFileCredentialsProvider());
+		//AmazonS3 s3 = new AmazonS3Client(new BasicAWSCredentials(System.getenv("AWS_ACCESS_KEY"), System.getenv("AWS_SECRET_KEY")));
 		
 		String bname, input;
 		String fname, lname, phone;
