@@ -11,15 +11,33 @@ import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
 import com.amazonaws.services.simpledb.model.ListDomainsResult;
+import com.sun.corba.se.spi.orbutil.fsm.Input;
 
 
 public class DBContacts {
 	public static void main(String[] args) throws Exception {
 		AmazonSimpleDB sdb = new AmazonSimpleDBClient(new ClasspathPropertiesFileCredentialsProvider());
 		AmazonS3 s3 = new AmazonS3Client(new ClasspathPropertiesFileCredentialsProvider());
-		Region reg = Region.getRegion(Regions.US_WEST_2);
 		Scanner sc = new Scanner(System.in);
 		
+		//just my default
+		Region reg = Region.getRegion(Regions.US_WEST_2);
+		
+		System.out.println("Select region: ");
+		System.out.println("1) US East");
+		System.out.println("2) US West 1");
+		System.out.println("3) US West 2");
+		String input = sc.nextLine();
+		if(input.contains("1")) {
+			reg = Region.getRegion(Regions.US_EAST_1);
+		}
+		else if(input.contains("2")) {
+			reg = Region.getRegion(Regions.US_WEST_1);
+		}
+		else if(input.contains("3")) {
+			reg = Region.getRegion(Regions.US_WEST_2);
+		}
+		else System.exit(0);
 		sdb.setRegion(reg);
 		
 		String domain = "Contact_Manager";
@@ -39,6 +57,13 @@ public class DBContacts {
 			if(!flag) sdb.createDomain(new CreateDomainRequest(domain));
 		}
 		
+		System.out.println("Current buckets: ");
+		List<Bucket> bucks = s3.listBuckets();
+		if(bucks.size() > 0) {
+			for(int i = 0; i < bucks.size(); i++) {
+				System.out.println(bucks.get(i).getName());
+			}
+		}
 		
 		System.out.println("Enter requested bucket name: ");
 		String bname = sc.nextLine();
@@ -63,7 +88,7 @@ public class DBContacts {
 		
 		DBContactManager manage = new DBContactManager(sdb, s3, domain, bname);
 		
-		String input = "";
+		input = "";
 		
 		//use same code for options
 		boolean options = true;
