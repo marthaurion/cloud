@@ -31,6 +31,7 @@ public class DBContactManager {
 		bucket = b;
 	}
 	
+	//simply displays all properties of a given item
 	public void details(String item) {
 		String query = "SELECT * FROM "+domain+" WHERE itemName() = '"+item+"'";
 		List<Item> res = sdb.select(new SelectRequest(query)).getItems();
@@ -89,6 +90,7 @@ public class DBContactManager {
 				in = s.nextLine();
 				query = "SELECT * FROM "+domain+" WHERE Tag='"+in+"'";
 			}
+			//for the birthday, give options
 			else if(in.contains("6")) {
 				System.out.println("1) Before");
 				System.out.println("2) After");
@@ -234,7 +236,7 @@ public class DBContactManager {
 		int x = indOf(list, "First_Name");
 		if(x != 0) list.add(0, list.remove(x));
 		
-		
+		//first display the current contact details before editing
 		System.out.println("Old Contact Details");
 		details(oldname);
 		System.out.println();
@@ -388,6 +390,7 @@ public class DBContactManager {
 		System.out.println("Contacted Updated.");
 	}
 	
+	//some helper functions
 	private int indOf(List<ReplaceableAttribute> list, String name) {
 		for(int i = 0; i < list.size(); i++) {
 			if(list.get(i).getName().equals(name)) {

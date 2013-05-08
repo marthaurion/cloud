@@ -11,7 +11,6 @@ import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
 import com.amazonaws.services.simpledb.model.CreateDomainRequest;
 import com.amazonaws.services.simpledb.model.ListDomainsResult;
-import com.sun.corba.se.spi.orbutil.fsm.Input;
 
 
 public class DBContacts {
@@ -82,8 +81,8 @@ public class DBContacts {
 		}
 		else {
 			//try to create bucket
-			//should default to US Standard
 			s3.createBucket(bname);
+			System.out.println("Created new bucket "+bname);
 		}
 		
 		DBContactManager manage = new DBContactManager(sdb, s3, domain, bname);
