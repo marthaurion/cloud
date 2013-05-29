@@ -8,6 +8,8 @@ import java.util.Random;
 import java.util.Scanner;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.model.Attribute;
 import com.amazonaws.services.simpledb.model.DeleteAttributesRequest;
@@ -16,16 +18,22 @@ import com.amazonaws.services.simpledb.model.PutAttributesRequest;
 import com.amazonaws.services.simpledb.model.ReplaceableAttribute;
 import com.amazonaws.services.simpledb.model.SelectRequest;
 import com.amazonaws.services.simpledb.model.SelectResult;
+import com.amazonaws.services.sns.AmazonSNS;
+import com.amazonaws.services.sns.model.PublishRequest;
 
 
 public class SNSContactManager {
 	private AmazonSimpleDB sdb;
 	private AmazonS3 s3;
+	private AmazonSNS sns;
+	private String arn;
 	private String domain;
 	private String bucket;
 	
-	public SNSContactManager(AmazonSimpleDB s, AmazonS3 s3, String d, String b) {
+	public SNSContactManager(AmazonSimpleDB s, AmazonS3 s3, AmazonSNS sn, String d, String b) {
 		sdb = s;
+		sns = sn;
+		arn = "arn:aws:sns:us-west-2:623818142879:51083-updated";
 		this.s3 = s3;
 		domain = d;
 		bucket = b;
@@ -153,6 +161,7 @@ public class SNSContactManager {
 		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
 		System.out.println("Enter first name: ");
 		String fname = s.nextLine();
+		String lname = null;
 		list.add(new ReplaceableAttribute("First_Name", fname, true));
 		
 		//allow the user to continuously add attributes
@@ -164,8 +173,9 @@ public class SNSContactManager {
 			if(input.charAt(0) == '1') {
 				System.out.println("Enter last name: ");
 				int x = indOf(list, "Last_Name");
+				lname = s.nextLine();
 				//if there is no last name field already
-				if(x < 0) list.add(new ReplaceableAttribute("Last_Name", s.nextLine(), true));
+				if(x < 0) list.add(new ReplaceableAttribute("Last_Name", lname, true));
 				//if there already is a last name to be added, replace it
 				else list.set(x, list.set(x, list.get(x).withValue(s.nextLine())));
 			}
@@ -211,9 +221,19 @@ public class SNSContactManager {
 		
 		String filename = generateHtml(list, item);
 		File F = new File(filename); 
-		s3.putObject(bucket, filename, F);
+		s3.putObject(new PutObjectRequest(bucket, filename, F).withCannedAcl(CannedAccessControlList.PublicRead));
 		F.delete();
 		System.out.println("Contacted Added.");
+		
+		
+		PublishRequest req = new PublishRequest();
+		req.setSubject("A new contact was added.");
+		
+		if(lname != null) fname = fname+" "+lname;
+		req.setMessage("Contact "+fname+" was created. Check the page here: https://s3.amazonaws.com/"+bucket+"/"+filename);
+		req.setTopicArn(arn);
+		
+		sns.publish(req);
 	}
 	
 	public void edit(Scanner s, String name) throws Exception {
@@ -385,9 +405,20 @@ public class SNSContactManager {
 		
 		String filename = generateHtml(list, item);
 		File F = new File(filename); 
-		s3.putObject(bucket, filename, F);
+		s3.putObject(new PutObjectRequest(bucket, filename, F).withCannedAcl(CannedAccessControlList.PublicRead));
 		F.delete();
 		System.out.println("Contacted Updated.");
+		
+		PublishRequest req = new PublishRequest();
+		req.setSubject("A contact was updated.");
+		
+		String fname = list.get(indOf(list, "First_Name")).getValue();
+		x = indOf(list, "Last_Name");
+		if(x >= 0) fname = fname+" "+list.get(x).getValue();
+		req.setMessage("Contact "+fname+" was updated. Check the page here: https://s3.amazonaws.com/"+bucket+"/"+filename);
+		req.setTopicArn(arn);
+		
+		sns.publish(req);
 	}
 	
 	//some helper functions

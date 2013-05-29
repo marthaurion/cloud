@@ -73,7 +73,7 @@ public class SNSContacts {
 			System.out.println("Created new bucket "+bname);
 		}
 		
-		SNSContactManager manage = new SNSContactManager(sdb, s3, domain, bname);
+		SNSContactManager manage = new SNSContactManager(sdb, s3, sns, domain, bname);
 		
 		String input = "";
 		
