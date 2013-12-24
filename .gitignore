@@ -5,3 +5,4 @@ bin/*
 *.zip
 hw2/tasklist.txt
 *.tar
+/bin
